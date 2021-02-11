@@ -5,12 +5,11 @@ import (
 	"net/http"
 	"log"
 
-	// "github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
-
 	"github.com/dgrijalva/jwt-go"
-)
 
+	"go_practice_mvc/model/user"
+)
 
 type User struct {
 	Name  string `json:"name"`
@@ -21,6 +20,7 @@ type UserCreateResponse struct {
 	Token string `json:"token"`
 }
 
+
 // ユーザアカウント認証情報作成
 func CreateUser(c echo.Context) error {	
 
@@ -30,11 +30,8 @@ func CreateUser(c echo.Context) error {
     }
 	name := u.Name
 	token := CreateToken(name)
-	error := db.Create(&User{
-		Name:  name,
-		Token: token,
-	}).Error
-
+	error := puser.Create(name. token)
+	
 	if error != nil {
 		fmt.Println(error)
 		return error

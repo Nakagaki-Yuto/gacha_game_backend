@@ -2,9 +2,9 @@ package server
  
 import (
 	"github.com/labstack/echo"
-	"go_practice_mvc/handler/character"
-	"go_practice_mvc/handler/gacha"
-	"go_practice_mvc/handler/user"
+	"go_practice_mvc/controller/character"
+	"go_practice_mvc/controller/gacha"
+	"go_practice_mvc/controller/user"
 )
 
 func NewRouter() *echo.Echo {

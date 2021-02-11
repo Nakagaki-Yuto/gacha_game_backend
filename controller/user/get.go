@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
-)
 
-var db *gorm.DB
+	"go_practice_mvc/model/user"
+)
 
 type UserGetResponse struct {
 	Name string `json:"name"` 
@@ -19,8 +18,7 @@ func GetUser(c echo.Context) error {
 
 	token := c.Request().Header.Get("x-token")
 	user := User{}
-	error := db.Where("token = ?", token).Find(&user).Error
-	fmt.Println(user)
+	error := puser.Get(token, user)
 
 	if error != nil {
 		fmt.Println(error)

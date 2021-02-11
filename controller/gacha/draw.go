@@ -6,11 +6,13 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
-)
 
-var db *gorm.DB
+	"go_practice_mvc/model/user"
+	"go_practice_mvc/model/usercharacter"
+	"go_practice_mvc/model/character"
+	"go_practice_mvc/model/gacharate"
+)
 
 type User struct {
 	ID int `json:"id"`
@@ -50,25 +52,47 @@ func DrawGacha(c echo.Context) error {
 
 	token := c.Request().Header.Get("x-token")
 	user := User{}
-	db.Where("token = ?", token).Find(&user)
+	error := puser.GetID(token, user)
+
+	if error != nil {
+		fmt.Println(error)
+		return error
+	} else {
+		fmt.Println("ユーザ情報を取得しました")
+	}
+
 	userID := user.ID
 	u := new(GachaDrawRequest)
+
     if err := c.Bind(u); err != nil {
         return err
     }
+
 	times := u.Times
-	fmt.Println(times)
+
 	var characters Characters
 
 	for i := 0; i < times; i++ {
-		targetCharacter := Gacha()
-		db.Create(&UserCharacter{
-			UserID: userID,
-			CharacterID: targetCharacter,
-		})
+		characterID := Gacha()
+		error = pusercharacter.Create(userID, characterID)
+
+		if error != nil {
+			fmt.Println(error)
+			return error
+		} else {
+			fmt.Println("ユーザー_キャラクター情報を作成しました")
+		}
 
 		character := Character{}
-		db.Where("id = ?", targetCharacter).Find(&character)
+		error = pcharacter.Get(characterID, character)
+
+		if error != nil {
+			fmt.Println(error)
+			return error
+		} else {
+			fmt.Println("キャラクター情報を取得しました")
+		}
+
 		characters = append(characters, character)
 	}
 
@@ -78,7 +102,15 @@ func DrawGacha(c echo.Context) error {
 // ガチャを引く
 func Gacha() string {
 	gachaRates := GachaRates{}
-	db.Find(&gachaRates)
+	error := pgacharate.Get(gachaRates)
+
+	if error != nil {
+		fmt.Println(error)
+		return error
+	} else {
+		fmt.Println("ガチャ情報を取得しました")
+	}
+	
 	kind := len(gachaRates)
 	rates := make([]int, kind)
 	maxCnt := 0

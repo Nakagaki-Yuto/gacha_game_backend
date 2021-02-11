@@ -1,4 +1,4 @@
-package utilities
+package database
 
 import (
 	"fmt"
@@ -18,6 +18,11 @@ func ConnectDB() {
 			fmt.Println("DB接続成功")
 		}
 }
+
+func GetDB() *gorm.DB {
+	return db
+}
+
 
 // SQLConnect DB接続
 func sqlConnect() (database *gorm.DB, err error) {

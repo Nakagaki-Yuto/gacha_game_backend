@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
-)
 
-var db *gorm.DB
+	"go_practice_mvc/model/user"
+	"go_practice_mvc/model/usercharacter"
+	"go_practice_mvc/model/character"
+)
 
 type User struct {
 	ID int `json:"id"`
@@ -43,21 +44,43 @@ type UserCharacterLists []UserCharacterList
 func GetCharacterList(c echo.Context) error {
 
 	token := c.Request().Header.Get("x-token")
-	user := User{}
-	db.Where("token = ?", token).Find(&user)
-	userID := user.ID
-	userCharacters := UserCharacters{}
+	user := &User{}
+	error := puser.GetID(token, *user)
+	
+	if error != nil {
+		fmt.Println(error)
+		return error
+	} else {
+		fmt.Println("ユーザ情報を取得しました")
+	}
 
-	db.Where("user_id = ?", userID).Find(&userCharacters)
+	userID := user.ID
+	userCharacters := &UserCharacters{}
+	error = pusercharacter.Get(userID, userCharacters)
+
+	if error != nil {
+		fmt.Println(error)
+		return error
+	} else {
+		fmt.Println("ユーザ‗キャラクター情報を取得しました")
+	}
 	
 	var userCharacterLists UserCharacterLists
 
 	for i := 0; i < len(userCharacters); i ++ {
-		targetCharacterID := userCharacters[i].CharacterID
+		characterID := userCharacters[i].CharacterID
 		userCharacterList := UserCharacterList{}
-		userCharacterList.CharacterID = targetCharacterID
+		userCharacterList.CharacterID = characterID
 		character := Character{}
-		db.Where("id = ?", targetCharacterID).Find(&character)
+		error := pcharacter.Get(characterID, character)
+
+		if error != nil {
+			fmt.Println(error)
+			return error
+		} else {
+			fmt.Println("キャラクター情報を取得しました")
+		}
+		
 		userCharacterList.Name = character.Name
 		userCharacterList.UserCharacterID = fmt.Sprintf("%d_%d", userID, i+1)  // "userID_所持順"のフォーマット
 		userCharacterLists = append(userCharacterLists, userCharacterList)
