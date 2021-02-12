@@ -17,8 +17,7 @@ type UserGetResponse struct {
 func GetUser(c echo.Context) error {
 
 	token := c.Request().Header.Get("x-token")
-	user := User{}
-	error := puser.Get(token, user)
+	user, error := puser.Get(token)
 
 	if error != nil {
 		fmt.Println(error)

@@ -1,6 +1,7 @@
 package pusercharacter
 
 import (
+	"fmt"
 
 	"go_practice_mvc/database"
 )
@@ -12,13 +13,22 @@ type UserCharacter struct {
 
 type UserCharacters []UserCharacter
 
-var db = database.GetDB()
+func Get(userID int) (UserCharacters, error) {
+	db := database.GetDB()
+	uc := UserCharacters{}
+	error := db.Where("user_id = ?", userID).Find(&uc).Error
 
-func Get(userID int, userCharacters *UserCharacters) error {
-	return db.Where("user_id = ?", userID).Find(&userCharacters).Error
+	if error != nil {
+		fmt.Println(error)
+	} else {
+		fmt.Println("ユーザ情報を取得しました")
+	}
+
+	return uc, error
 }
 
 func Create(userID int, characterID string) error {
+	db := database.GetDB()
 	return db.Create(&UserCharacter{
 		UserID: userID,
 		CharacterID: characterID,

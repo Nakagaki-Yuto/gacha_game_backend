@@ -44,8 +44,7 @@ type UserCharacterLists []UserCharacterList
 func GetCharacterList(c echo.Context) error {
 
 	token := c.Request().Header.Get("x-token")
-	user := &User{}
-	error := puser.GetID(token, *user)
+	user, error := puser.GetID(token)
 	
 	if error != nil {
 		fmt.Println(error)
@@ -55,8 +54,7 @@ func GetCharacterList(c echo.Context) error {
 	}
 
 	userID := user.ID
-	userCharacters := &UserCharacters{}
-	error = pusercharacter.Get(userID, userCharacters)
+	userCharacters, error := pusercharacter.Get(userID)
 
 	if error != nil {
 		fmt.Println(error)
@@ -71,8 +69,7 @@ func GetCharacterList(c echo.Context) error {
 		characterID := userCharacters[i].CharacterID
 		userCharacterList := UserCharacterList{}
 		userCharacterList.CharacterID = characterID
-		character := Character{}
-		error := pcharacter.Get(characterID, character)
+		character, error := pcharacter.Get(characterID)
 
 		if error != nil {
 			fmt.Println(error)

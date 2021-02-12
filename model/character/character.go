@@ -1,18 +1,25 @@
 package pcharacter
 
 import (
-
+	"fmt"
 	"go_practice_mvc/database"
 )
 
-var db = database.GetDB()
-
 type Character struct {
-	ID string `json:"characterID"`
+	ID   string `json:"characterID"`
 	Name string `json:"name"`
 }
 
-func Get(characterID int, character *Character) error {
-	return db.Where("id = ?", characterID).Find(&character).Error
+func Get(characterID string) (Character, error) {
+	db := database.GetDB()
+	c := Character{}
+	error := db.Where("id = ?", characterID).Find(&c).Error
 
+	if error != nil {
+		fmt.Println(error)
+	} else {
+		fmt.Println("キャラクター情報を取得しました")
+	}
+
+	return c, error
 }

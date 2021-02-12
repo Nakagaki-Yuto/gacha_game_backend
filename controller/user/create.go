@@ -30,8 +30,8 @@ func CreateUser(c echo.Context) error {
     }
 	name := u.Name
 	token := CreateToken(name)
-	error := puser.Create(name. token)
-	
+	error := puser.Create(name, token)
+
 	if error != nil {
 		fmt.Println(error)
 		return error
