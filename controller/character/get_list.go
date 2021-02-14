@@ -49,8 +49,6 @@ func GetCharacterList(c echo.Context) error {
 	if error != nil {
 		fmt.Println(error)
 		return error
-	} else {
-		fmt.Println("ユーザ情報を取得しました")
 	}
 
 	userID := user.ID
@@ -59,8 +57,6 @@ func GetCharacterList(c echo.Context) error {
 	if error != nil {
 		fmt.Println(error)
 		return error
-	} else {
-		fmt.Println("ユーザ‗キャラクター情報を取得しました")
 	}
 	
 	var userCharacterLists UserCharacterLists
@@ -74,8 +70,6 @@ func GetCharacterList(c echo.Context) error {
 		if error != nil {
 			fmt.Println(error)
 			return error
-		} else {
-			fmt.Println("キャラクター情報を取得しました")
 		}
 		
 		userCharacterList.Name = character.Name
@@ -83,5 +77,6 @@ func GetCharacterList(c echo.Context) error {
 		userCharacterLists = append(userCharacterLists, userCharacterList)
 	}
 
+	fmt.Println("ユーザ-キャラクター一覧を取得しました")
 	return c.JSON(http.StatusOK, Result{Result: userCharacterLists})
 }

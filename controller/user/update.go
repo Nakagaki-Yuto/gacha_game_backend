@@ -25,9 +25,9 @@ func UpdateUser(c echo.Context) error {
 	if error != nil {
 		fmt.Println(error)
 		return error
-	} else {
-		fmt.Println("ユーザ情報を更新しました")
 	}
+	
+	fmt.Println("ユーザ情報を更新しました")
 
 	return c.JSON(http.StatusOK, "name change succeed")
 }

@@ -28,8 +28,6 @@ func Get(token string) (User, error) {
 
 	if error != nil {
 		fmt.Println(error)
-	} else {
-		fmt.Println("ユーザ情報を取得しました")
 	}
 
 	return u, error
@@ -50,8 +48,6 @@ func GetID(token string) (User, error) {
 
 	if error != nil {
 		fmt.Println(error)
-	} else {
-		fmt.Println("ユーザ情報を取得しました")
 	}
 
 	return ui, error

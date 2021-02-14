@@ -22,9 +22,9 @@ func GetUser(c echo.Context) error {
 	if error != nil {
 		fmt.Println(error)
 		return error
-	} else {
-		fmt.Println("ユーザ情報を取得しました")
 	}
 
+	fmt.Println("ユーザ情報を取得しました")
+	
 	return c.JSON(http.StatusOK, UserGetResponse{Name: user.Name})
 }

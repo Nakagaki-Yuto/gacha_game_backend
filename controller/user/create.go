@@ -35,9 +35,9 @@ func CreateUser(c echo.Context) error {
 	if error != nil {
 		fmt.Println(error)
 		return error
-	} else {
-		fmt.Println("ユーザアカウント認証情報を作成しました")
 	}
+
+	fmt.Println("ユーザアカウント認証情報を作成しました")
 	
 	return c.JSON(http.StatusOK, UserCreateResponse{Token: token})
 }

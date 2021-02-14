@@ -20,10 +20,7 @@ func Get(userID int) (UserCharacters, error) {
 
 	if error != nil {
 		fmt.Println(error)
-	} else {
-		fmt.Println("ユーザ情報を取得しました")
 	}
-
 	return uc, error
 }
 

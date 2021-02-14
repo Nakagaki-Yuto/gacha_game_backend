@@ -17,8 +17,6 @@ func Get(characterID string) (Character, error) {
 
 	if error != nil {
 		fmt.Println(error)
-	} else {
-		fmt.Println("キャラクター情報を取得しました")
 	}
 
 	return c, error

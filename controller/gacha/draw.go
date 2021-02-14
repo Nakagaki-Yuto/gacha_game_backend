@@ -56,8 +56,6 @@ func DrawGacha(c echo.Context) error {
 	if error != nil {
 		fmt.Println(error)
 		return error
-	} else {
-		fmt.Println("ユーザ情報を取得しました")
 	}
 
 	userID := user.ID
@@ -77,8 +75,6 @@ func DrawGacha(c echo.Context) error {
 		if err != nil {
 			fmt.Println(err)
 			return err
-		} else {
-			fmt.Println("ガチャを引きました")
 		}
 
 		error = pusercharacter.Create(userID, characterID)
@@ -86,8 +82,6 @@ func DrawGacha(c echo.Context) error {
 		if error != nil {
 			fmt.Println(error)
 			return error
-		} else {
-			fmt.Println("ユーザー_キャラクター情報を作成しました")
 		}
 
 		character, error := pcharacter.Get(characterID)
@@ -95,9 +89,8 @@ func DrawGacha(c echo.Context) error {
 		if error != nil {
 			fmt.Println(error)
 			return error
-		} else {
-			fmt.Println("キャラクター情報を取得しました")
 		}
+
 		c := Character{
 			ID : character.ID,
 			Name : character.Name,
@@ -105,6 +98,8 @@ func DrawGacha(c echo.Context) error {
 
 		characters = append(characters, c)
 	}
+
+	fmt.Println("ガチャを引きました")
 
 	return c.JSON(http.StatusOK, Result{Result: characters})
 }
@@ -116,8 +111,6 @@ func Gacha() (string, error) {
 
 	if error != nil {
 		fmt.Println(error)
-	} else {
-		fmt.Println("ガチャ情報を取得しました")
 	}
 
 	kind := len(gachaRates)

@@ -20,8 +20,6 @@ func Get() (GachaRates, error) {
 
 	if error != nil {
 		fmt.Println(error)
-	} else {
-		fmt.Println("ガチャ情報を取得しました")
 	}
 
 	return gr, error
