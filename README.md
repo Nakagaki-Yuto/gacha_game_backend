@@ -1,1 +1,1 @@
-# golang_practice_mvc
+# gacha_game
