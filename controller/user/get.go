@@ -5,26 +5,35 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
-
-	"go_practice_mvc/model/user"
 )
 
 type UserGetResponse struct {
-	Name string `json:"name"` 
+	Name string `json:"name"`
+}
+
+type Handler struct {
+	db *DB
+}
+
+func New(db *DB) *Handler {
+	return &Handler{
+		db: db,
+	}
 }
 
 // ユーザ情報取得
-func GetUser(c echo.Context) error {
+func (h *Handler) GetUser(c echo.Context) error {
 
 	token := c.Request().Header.Get("x-token")
-	user, error := puser.Get(token)
-
-	if error != nil {
-		fmt.Println(error)
-		return error
-	}
+	user, _ := h.db.GetUser()
+	// user, _ := puser.Get(token)
+	//
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return err
+	// }
 
 	fmt.Println("ユーザ情報を取得しました")
-	
+
 	return c.JSON(http.StatusOK, UserGetResponse{Name: user.Name})
 }

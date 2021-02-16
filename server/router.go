@@ -1,23 +1,28 @@
 package server
- 
+
 import (
 	"github.com/labstack/echo"
-	"go_practice_mvc/controller/character"
-	"go_practice_mvc/controller/gacha"
-	"go_practice_mvc/controller/user"
 )
 
-func NewRouter() *echo.Echo {
-	
+type Server struct {
+	handler Handler
+}
+
+func New(db *DB) *Server {
+	return &Server{
+		db: db,
+	}
+}
+
+func (s *Server) Run() error {
 	e := echo.New()
 
 	// ルーティング
-	e.POST("/user/create", user.CreateUser)
-	e.GET("/user/get", user.GetUser)
-	e.PUT("/user/update", user.UpdateUser)
-	e.POST("/gacha/draw", gacha.DrawGacha)
-	e.GET("/character/list", character.GetCharacterList)
-	
-    return e
-}
+	e.POST("/user/create", s.handler.CreateUser)
+	e.GET("/user/get", s.handler.GetUser)
+	e.PUT("/user/update", s.handler.UpdateUser)
+	e.POST("/gacha/draw", s.handler.DrawGacha)
+	e.GET("/character/list", s.handler.GetCharacterList)
 
+	return e.Start(":8080")
+}

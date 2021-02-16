@@ -2,43 +2,40 @@ package user
 
 import (
 	"fmt"
-	"net/http"
 	"log"
+	"net/http"
 
-	"github.com/labstack/echo"
 	"github.com/dgrijalva/jwt-go"
-
-	"go_practice_mvc/model/user"
+	"github.com/labstack/echo"
 )
 
-type User struct {
-	Name  string `json:"name"`
-	Token string `json:"token"`
+type UserCreateRequest struct {
+	Name string `json:"name"`
+	// Token string `json:"token"`
 }
 
 type UserCreateResponse struct {
 	Token string `json:"token"`
 }
 
-
 // ユーザアカウント認証情報作成
-func CreateUser(c echo.Context) error {	
+func CreateUser(c echo.Context) error {
 
-	u := new(User)
-    if err := c.Bind(u); err != nil {
-        return err
-    }
-	name := u.Name
+	req := new(UserCreateRequest)
+	if err := c.Bind(req); err != nil {
+		return err
+	}
+	name := req.Name
 	token := CreateToken(name)
-	error := puser.Create(name, token)
+	_, err := puser.Create(name, token)
 
-	if error != nil {
-		fmt.Println(error)
-		return error
+	if err != nil {
+		fmt.Println(err)
+		return err
 	}
 
 	fmt.Println("ユーザアカウント認証情報を作成しました")
-	
+
 	return c.JSON(http.StatusOK, UserCreateResponse{Token: token})
 }
 
