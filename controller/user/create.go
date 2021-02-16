@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"log"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/dgrijalva/jwt-go"
 
 	"go_practice_mvc/model/user"

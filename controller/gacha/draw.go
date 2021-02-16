@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 
 	pcharacter "go_practice_mvc/model/character"
 	pgacharate "go_practice_mvc/model/gacharate"
@@ -92,8 +92,8 @@ func DrawGacha(c echo.Context) error {
 		}
 
 		c := Character{
-			ID : character.ID,
-			Name : character.Name,
+			ID:   character.ID,
+			Name: character.Name,
 		}
 
 		characters = append(characters, c)
@@ -106,7 +106,7 @@ func DrawGacha(c echo.Context) error {
 
 // ガチャを引く
 func Gacha() (string, error) {
-	
+
 	gachaRates, error := pgacharate.Get()
 
 	if error != nil {
