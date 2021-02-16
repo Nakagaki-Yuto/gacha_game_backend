@@ -7,18 +7,27 @@ import (
 )
 
 type User struct {
-	ID int `json:"id"`
+	ID    int    `json:"id"`
 	Name  string `json:"name"`
 	Token string `json:"token"`
 }
 
-
-func Create(name string, token string) error {
+func Create(name string, token string) (*User, error) {
 	db := database.GetDB()
-	return db.Create(&User{
+
+	user := &User{
 		Name:  name,
 		Token: token,
-	}).Error
+	}
+
+	if err := db.Create(&User{
+		Name:  name,
+		Token: token,
+	}).Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func Get(token string) (User, error) {
