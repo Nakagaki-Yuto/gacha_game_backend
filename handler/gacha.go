@@ -8,13 +8,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	character "go_practice_mvc/model"
 )
 
-type User struct {
-	ID    int    `json:"id"`
-	Token string `json:"token"`
-}
+
 type GachaDrawRequest struct {
 	Times int `json:"times"`
 }
@@ -48,7 +44,7 @@ type GachaRates []GachaRate
 func (h *Handler) DrawGacha(c echo.Context) error {
 
 	token := c.Request().Header.Get("x-token")
-	user, error := puser.GetID(token)
+	user, error := h.db.GetUserID(token)
 
 	if error != nil {
 		fmt.Println(error)
@@ -74,14 +70,14 @@ func (h *Handler) DrawGacha(c echo.Context) error {
 			return err
 		}
 
-		error = pusercharacter.Create(userID, characterID)
+		error = h.db.CreateUserCharacter(userID, characterID)
 
 		if error != nil {
 			fmt.Println(error)
 			return error
 		}
 
-		character, error := character.Get(characterID)
+		character, error := h.db.GetCharacter(characterID)
 
 		if error != nil {
 			fmt.Println(error)
@@ -104,7 +100,7 @@ func (h *Handler) DrawGacha(c echo.Context) error {
 // ガチャを引く
 func Gacha() (string, error) {
 
-	gachaRates, error := gacharate.Get()
+	gachaRates, error := h.db.GetGachaRate()
 
 	if error != nil {
 		fmt.Println(error)

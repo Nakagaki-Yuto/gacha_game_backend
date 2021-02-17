@@ -6,13 +6,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"go_practice_mvc/model"
 )
 
-type User struct {
-	ID int `json:"id"`
-	Token string `json:"token"`
-}
+
 
 type UserCharacter struct {
 	UserID int `json:"userID"`
@@ -42,7 +38,7 @@ type UserCharacterLists []UserCharacterList
 func (h *Handler) GetCharacterList(c echo.Context) error {
 
 	token := c.Request().Header.Get("x-token")
-	user, error := puser.GetID(token)
+	user, error := h.db.GetUserID(token)
 	
 	if error != nil {
 		fmt.Println(error)
@@ -50,7 +46,7 @@ func (h *Handler) GetCharacterList(c echo.Context) error {
 	}
 
 	userID := user.ID
-	userCharacters, error := pusercharacter.Get(userID)
+	userCharacters, error := h.db.GetUserCharacter(userID)
 
 	if error != nil {
 		fmt.Println(error)
@@ -63,7 +59,7 @@ func (h *Handler) GetCharacterList(c echo.Context) error {
 		characterID := userCharacters[i].CharacterID
 		userCharacterList := UserCharacterList{}
 		userCharacterList.CharacterID = characterID
-		character, error := character.Get(characterID)
+		character, error := h.db.GetCharacter(characterID)
 
 		if error != nil {
 			fmt.Println(error)

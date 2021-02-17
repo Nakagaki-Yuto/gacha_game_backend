@@ -9,10 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type User struct {
-	Name  string `json:"name"`
-	Token string `json:"token"`
-}
+
 
 type UserCreateResponse struct {
 	Token string `json:"token"`
@@ -27,7 +24,7 @@ func (h *Handler) CreateUser(c echo.Context) error {
 	}
 	name := u.Name
 	token := CreateToken(name)
-	error := puser.Create(name, token)
+	error := h.db.CreateUser(name, token)
 
 	if error != nil {
 		fmt.Println(error)
@@ -71,7 +68,7 @@ type UserGetResponse struct {
 func (h *Handler) GetUser(c echo.Context) error {
 
 	token := c.Request().Header.Get("x-token")
-	user, error := puser.Get(token)
+	user, error := h.db.GetUser(token)
 
 	if error != nil {
 		fmt.Println(error)
@@ -83,6 +80,8 @@ func (h *Handler) GetUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, UserGetResponse{Name: user.Name})
 }
 
+
+
 // ユーザ情報更新
 func (h *Handler) UpdateUser(c echo.Context) error {
 
@@ -92,10 +91,8 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 	}
 	name := u.Name
 	token := c.Request().Header.Get("x-token")
-	error := puser.Update(name, token)
-	fmt.Println(name)
-	fmt.Println(token)
-	fmt.Println(error)
+	error := h.db.UpdateUser(name, token)
+
 	if error != nil {
 		fmt.Println(error)
 		return error
