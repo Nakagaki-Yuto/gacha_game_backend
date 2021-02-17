@@ -1,7 +1,10 @@
-package pcharacter
+package user
 
 import (
 	"fmt"
+
+	"github.com/jinzhu/gorm"
+
 	"go_practice_mvc/database"
 )
 
@@ -11,7 +14,6 @@ type Character struct {
 }
 
 func Get(characterID string) (Character, error) {
-	db := database.GetDB()
 	c := Character{}
 	error := db.Where("id = ?", characterID).Find(&c).Error
 

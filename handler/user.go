@@ -1,14 +1,12 @@
-package user
+package handler
 
 import (
 	"fmt"
-	"net/http"
 	"log"
+	"net/http"
 
-	"github.com/labstack/echo/v4"
 	"github.com/dgrijalva/jwt-go"
-
-	"go_practice_mvc/model/user"
+	"github.com/labstack/echo/v4"
 )
 
 type User struct {
@@ -20,14 +18,13 @@ type UserCreateResponse struct {
 	Token string `json:"token"`
 }
 
-
 // ユーザアカウント認証情報作成
-func CreateUser(c echo.Context) error {	
+func (h *Handler) CreateUser(c echo.Context) error {
 
 	u := new(User)
-    if err := c.Bind(u); err != nil {
-        return err
-    }
+	if err := c.Bind(u); err != nil {
+		return err
+	}
 	name := u.Name
 	token := CreateToken(name)
 	error := puser.Create(name, token)
@@ -38,7 +35,7 @@ func CreateUser(c echo.Context) error {
 	}
 
 	fmt.Println("ユーザアカウント認証情報を作成しました")
-	
+
 	return c.JSON(http.StatusOK, UserCreateResponse{Token: token})
 }
 
@@ -64,4 +61,47 @@ func CreateToken(name string) string {
 	}
 
 	return tokenString
+}
+
+type UserGetResponse struct {
+	Name string `json:"name"`
+}
+
+// ユーザ情報取得
+func (h *Handler) GetUser(c echo.Context) error {
+
+	token := c.Request().Header.Get("x-token")
+	user, error := puser.Get(token)
+
+	if error != nil {
+		fmt.Println(error)
+		return error
+	}
+
+	fmt.Println("ユーザ情報を取得しました")
+
+	return c.JSON(http.StatusOK, UserGetResponse{Name: user.Name})
+}
+
+// ユーザ情報更新
+func (h *Handler) UpdateUser(c echo.Context) error {
+
+	u := new(User)
+	if err := c.Bind(u); err != nil {
+		return err
+	}
+	name := u.Name
+	token := c.Request().Header.Get("x-token")
+	error := puser.Update(name, token)
+	fmt.Println(name)
+	fmt.Println(token)
+	fmt.Println(error)
+	if error != nil {
+		fmt.Println(error)
+		return error
+	}
+
+	fmt.Println("ユーザ情報を更新しました")
+
+	return c.JSON(http.StatusOK, "name change succeed")
 }

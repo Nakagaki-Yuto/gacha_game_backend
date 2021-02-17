@@ -1,4 +1,4 @@
-package pusercharacter
+package model
 
 import (
 	"fmt"

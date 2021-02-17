@@ -7,22 +7,18 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-var db *gorm.DB
 var sqlerr error
 
-func ConnectDB() {
-	db, sqlerr = sqlConnect()
-		if sqlerr != nil {
-			panic(sqlerr.Error())
-		} else {
-			fmt.Println("DB接続成功")
-		}
-}
+func New() *gorm.DB {
+	db, sqlerr := sqlConnect()
+	if sqlerr != nil {
+		panic(sqlerr.Error())
+	} else {
+		fmt.Println("DB接続成功")
+	}
 
-func GetDB() *gorm.DB {
 	return db
 }
-
 
 // SQLConnect DB接続
 func sqlConnect() (database *gorm.DB, err error) {

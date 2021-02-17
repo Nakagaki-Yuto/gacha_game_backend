@@ -1,4 +1,4 @@
-package puser
+package model
 
 import (
 	"fmt"

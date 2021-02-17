@@ -4,29 +4,33 @@ import (
 	"github.com/labstack/echo/v4/middleware" 
 	"github.com/labstack/echo/v4"
 
-	"go_practice_mvc/controller/character"
-	"go_practice_mvc/controller/gacha"
-	"go_practice_mvc/controller/user"
+	"go_practice_mvc/handler/"
 )
 
-func NewRouter() *echo.Echo {
+
+
+type Server struct {
+	handler Handler
+}
+
+func New(handler *Handler) *Server {
+	return &Server{
+		handler: handler,
+	}
+}
+
+func (s *Server) Run() error {
 	
 	e := echo.New()
-	// e.Use(middleware.Logger())
-	// e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
-	// e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-	// 	AllowOrigins: []string{"http://localhost:3000/", "http://localhost:8080/"},
-	// 	AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
-	//   }))
 
 	// ルーティング
-	e.POST("/user/create", user.CreateUser)
-	e.GET("/user/get", user.GetUser)
-	e.PUT("/user/update", user.UpdateUser)
-	e.POST("/gacha/draw", gacha.DrawGacha)
-	e.GET("/character/list", character.GetCharacterList)
-	
-    return e
+	e.POST("/user/create", s.handler.CreateUser)
+	e.GET("/user/get", s.handler.GetUser)
+	e.PUT("/user/update", s.handler.UpdateUser)
+	e.POST("/gacha/draw", s.handler.DrawGacha)
+	e.GET("/character/list", s.handler.GetCharacterList)
+
+	return e.Start(":8080")
 }
 

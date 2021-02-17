@@ -1,4 +1,4 @@
-package pgacharate
+package model
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 )
 
 type GachaRate struct {
-	Rate int `json:"rate"`
+	Rate        int    `json:"rate"`
 	CharacterID string `json:"characterID"`
 }
 

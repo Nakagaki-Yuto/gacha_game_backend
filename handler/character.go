@@ -1,4 +1,4 @@
-package character
+package handler
 
 import (
 	"fmt"
@@ -6,9 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"go_practice_mvc/model/user"
-	"go_practice_mvc/model/usercharacter"
-	"go_practice_mvc/model/character"
+	"go_practice_mvc/model"
 )
 
 type User struct {
@@ -41,7 +39,7 @@ type UserCharacterList struct {
 type UserCharacterLists []UserCharacterList
 
 // ユーザ所持キャラクター一覧取得
-func GetCharacterList(c echo.Context) error {
+func (h *Handler) GetCharacterList(c echo.Context) error {
 
 	token := c.Request().Header.Get("x-token")
 	user, error := puser.GetID(token)
@@ -65,7 +63,7 @@ func GetCharacterList(c echo.Context) error {
 		characterID := userCharacters[i].CharacterID
 		userCharacterList := UserCharacterList{}
 		userCharacterList.CharacterID = characterID
-		character, error := pcharacter.Get(characterID)
+		character, error := character.Get(characterID)
 
 		if error != nil {
 			fmt.Println(error)

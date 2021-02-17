@@ -2,15 +2,18 @@ package main
 
 import (
 
-	"go_practice_mvc/server"
 	"go_practice_mvc/database"
+	"go_practice_mvc/server"
+	"log"
 )
 
 func main() {
-	router := server.NewRouter()
-	database.ConnectDB()
 
-    router.Logger.Fatal(router.Start(":8080"))
+	db := database.New()
+	handler := handler.New(db)
+	server := server.New(handler)
+
+	log.Fatal(server.Run())
 }
 
 

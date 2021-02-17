@@ -1,4 +1,4 @@
-package gacha
+package handler
 
 import (
 	"fmt"
@@ -8,10 +8,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	pcharacter "go_practice_mvc/model/character"
-	pgacharate "go_practice_mvc/model/gacharate"
-	puser "go_practice_mvc/model/user"
-	pusercharacter "go_practice_mvc/model/usercharacter"
+	character "go_practice_mvc/model"
 )
 
 type User struct {
@@ -48,7 +45,7 @@ type GachaRate struct {
 type GachaRates []GachaRate
 
 // ガチャ実行
-func DrawGacha(c echo.Context) error {
+func (h *Handler) DrawGacha(c echo.Context) error {
 
 	token := c.Request().Header.Get("x-token")
 	user, error := puser.GetID(token)
@@ -84,7 +81,7 @@ func DrawGacha(c echo.Context) error {
 			return error
 		}
 
-		character, error := pcharacter.Get(characterID)
+		character, error := character.Get(characterID)
 
 		if error != nil {
 			fmt.Println(error)
@@ -107,7 +104,7 @@ func DrawGacha(c echo.Context) error {
 // ガチャを引く
 func Gacha() (string, error) {
 
-	gachaRates, error := pgacharate.Get()
+	gachaRates, error := gacharate.Get()
 
 	if error != nil {
 		fmt.Println(error)
