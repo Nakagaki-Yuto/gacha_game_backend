@@ -9,31 +9,33 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-
+type UserCreateRequest struct {
+	Name string `json:"name"`
+}
 
 type UserCreateResponse struct {
 	Token string `json:"token"`
 }
 
 // ユーザアカウント認証情報作成
-func (h *Handler) CreateUser(c echo.Context) error {
+func (h Handler) CreateUser(c echo.Context) error {
 
-	u := new(User)
-	if err := c.Bind(u); err != nil {
+	req := new(UserCreateRequest)
+	if err := c.Bind(req); err != nil {
 		return err
 	}
-	name := u.Name
-	token := CreateToken(name)
-	error := h.db.CreateUser(name, token)
+	n := req.Name
+	t := CreateToken(n)
+	err := h.db.CreateUser(n, t)
 
-	if error != nil {
-		fmt.Println(error)
-		return error
+	if err != nil {
+		fmt.Println(err)
+		return err
 	}
 
 	fmt.Println("ユーザアカウント認証情報を作成しました")
 
-	return c.JSON(http.StatusOK, UserCreateResponse{Token: token})
+	return c.JSON(http.StatusOK, UserCreateResponse{Token: t})
 }
 
 // ト-クンの作成
@@ -46,12 +48,12 @@ func CreateToken(name string) string {
 	// jwt -> JSON Web Token - JSON をセキュアにやり取りするための仕様
 	// jwtの構造 -> {Base64 encoded Header}.{Base64 encoded Payload}.{Signature}
 	// HS254 -> 証明生成用(https://ja.wikipedia.org/wiki/JSON_Web_Token)
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"name": name,
 		"iss":  "init",
 	})
 
-	tokenString, err := token.SignedString([]byte(secret))
+	tokenString, err := t.SignedString([]byte(secret))
 
 	if err != nil {
 		log.Fatal(err)
@@ -65,40 +67,42 @@ type UserGetResponse struct {
 }
 
 // ユーザ情報取得
-func (h *Handler) GetUser(c echo.Context) error {
+func (h Handler) GetUser(c echo.Context) error {
 
-	token := c.Request().Header.Get("x-token")
-	user, error := h.db.GetUser(token)
+	t := c.Request().Header.Get("x-token")
+	u, err := h.db.GetUser(t)
 
-	if error != nil {
-		fmt.Println(error)
-		return error
+	if err != nil {
+		fmt.Println(err)
+		return err
 	}
 
 	fmt.Println("ユーザ情報を取得しました")
 
-	return c.JSON(http.StatusOK, UserGetResponse{Name: user.Name})
+	return c.JSON(http.StatusOK, UserGetResponse{Name: u.Name})
 }
 
-
+type UserUpdateRequest struct {
+	Name string `json:"name"`
+}
 
 // ユーザ情報更新
-func (h *Handler) UpdateUser(c echo.Context) error {
+func (h Handler) UpdateUser(c echo.Context) error {
 
-	u := new(User)
-	if err := c.Bind(u); err != nil {
+	req := new(UserUpdateRequest)
+	if err := c.Bind(req); err != nil {
 		return err
 	}
-	name := u.Name
-	token := c.Request().Header.Get("x-token")
-	error := h.db.UpdateUser(name, token)
+	n := req.Name
+	t := c.Request().Header.Get("x-token")
+	err := h.db.UpdateUser(n, t)
 
-	if error != nil {
-		fmt.Println(error)
-		return error
+	if err != nil {
+		fmt.Println(err)
+		return err
 	}
 
 	fmt.Println("ユーザ情報を更新しました")
 
-	return c.JSON(http.StatusOK, "name change succeed")
+	return c.JSON(http.StatusOK, " ")
 }

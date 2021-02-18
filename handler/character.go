@@ -5,72 +5,58 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-
 )
 
-
+type CharacterListResponse struct {
+	characters UserCharacters `json:"characters"`
+}
 
 type UserCharacter struct {
-	UserID int `json:"userID"`
-	CharacterID string `json:"characterID"`
+	UserCharacterID string `json:"userCharacterID"`
+	CharacterID     string `json:"characterID"`
+	Name            string `json:"name"`
 }
 
 type UserCharacters []UserCharacter
 
-type Character struct {
-	ID string `json:"characterID"`
-	Name string `json:"name"`
-}
-
-type Result struct {
-	Result UserCharacterLists `json:"characters"`
-}
-
-type UserCharacterList struct {
-	UserCharacterID string `json:"userCharacterID"`
-	CharacterID string `json:"characterID"`
-	Name string `json:"name"` 
-}
-
-type UserCharacterLists []UserCharacterList
-
 // ユーザ所持キャラクター一覧取得
-func (h *Handler) GetCharacterList(c echo.Context) error {
+func (h Handler) GetCharacterList(c echo.Context) error {
 
-	token := c.Request().Header.Get("x-token")
-	user, error := h.db.GetUserID(token)
-	
-	if error != nil {
-		fmt.Println(error)
-		return error
+	t := c.Request().Header.Get("x-token")
+	u, err := h.db.GetUserID(t)
+
+	if err != nil {
+		fmt.Println(err)
+		return err
 	}
 
-	userID := user.ID
-	userCharacters, error := h.db.GetUserCharacter(userID)
+	uI := u.ID
+	userChara, err := h.db.GetUserCharacter(uI)
 
-	if error != nil {
-		fmt.Println(error)
-		return error
+	if err != nil {
+		fmt.Println(err)
+		return err
 	}
-	
-	var userCharacterLists UserCharacterLists
 
-	for i := 0; i < len(userCharacters); i ++ {
-		characterID := userCharacters[i].CharacterID
-		userCharacterList := UserCharacterList{}
-		userCharacterList.CharacterID = characterID
-		character, error := h.db.GetCharacter(characterID)
+	var userCharacters UserCharacters
 
-		if error != nil {
-			fmt.Println(error)
-			return error
+	for i := 0; i < len(userChara); i++ {
+		cI := userChara[i].CharacterID
+		uc := UserCharacter{}
+		uc.CharacterID = cI
+		chara, err := h.db.GetCharacter(cI)
+
+		if err != nil {
+			fmt.Println(err)
+			return err
 		}
-		
-		userCharacterList.Name = character.Name
-		userCharacterList.UserCharacterID = fmt.Sprintf("%d_%d", userID, i+1)  // "userID_所持順"のフォーマット
-		userCharacterLists = append(userCharacterLists, userCharacterList)
+
+		uc.Name = chara.Name
+		uc.UserCharacterID = fmt.Sprintf("%d_%d", uI, i+1) // "userID_所持順"のフォーマット
+		userCharacters = append(userCharacters, uc)
 	}
 
 	fmt.Println("ユーザ-キャラクター一覧を取得しました")
-	return c.JSON(http.StatusOK, Result{Result: userCharacterLists})
+
+	return c.JSON(http.StatusOK, CharacterListResponse{characters: userCharacters})
 }

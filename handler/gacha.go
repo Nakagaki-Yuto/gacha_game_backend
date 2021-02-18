@@ -15,95 +15,81 @@ type GachaDrawRequest struct {
 	Times int `json:"times"`
 }
 
-type Result struct {
-	Result Characters `json:"results"`
+type GachaDrawResponse struct {
+	Results GachaResults `json:"results"`
 }
 
-type UserCharacter struct {
-	UserID      int    `json:"userID"`
+type GachaResult struct {
 	CharacterID string `json:"characterID"`
-}
-
-type UserCharacters []UserCharacter
-
-type Character struct {
-	ID   string `json:"characterID"`
 	Name string `json:"name"`
 }
 
-type Characters []Character
-
-type GachaRate struct {
-	Rate        int    `json:"rate"`
-	CharacterID string `json:"characterID"`
-}
-
-type GachaRates []GachaRate
+type GachaResults []GachaResult
 
 // ガチャ実行
-func (h *Handler) DrawGacha(c echo.Context) error {
-
-	token := c.Request().Header.Get("x-token")
-	user, error := h.db.GetUserID(token)
-
-	if error != nil {
-		fmt.Println(error)
-		return error
-	}
-
-	userID := user.ID
-	u := new(GachaDrawRequest)
-
-	if err := c.Bind(u); err != nil {
+func (h Handler) DrawGacha(c echo.Context) error {
+	
+	t := c.Request().Header.Get("x-token")
+	u, err := h.db.GetUserID(t)
+	
+	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
-	times := u.Times
+	uI := u.ID
+	req := new(GachaDrawRequest)
 
-	var characters Characters
+	if err := c.Bind(req); err != nil {
+		return err
+	}
+
+	times := req.Times
+
+	var gachaResults GachaResults
 
 	for i := 0; i < times; i++ {
-		characterID, err := Gacha()
+		characterID, err := h.Gacha()
 
 		if err != nil {
 			fmt.Println(err)
 			return err
 		}
 
-		error = h.db.CreateUserCharacter(userID, characterID)
+		err = h.db.CreateUserCharacter(uI, characterID)
 
-		if error != nil {
-			fmt.Println(error)
-			return error
+		if err != nil {
+			fmt.Println(err)
+			return err
 		}
 
-		character, error := h.db.GetCharacter(characterID)
+		chara, err := h.db.GetCharacter(characterID)
 
-		if error != nil {
-			fmt.Println(error)
-			return error
+		if err != nil {
+			fmt.Println(err)
+			return err
 		}
 
-		c := Character{
-			ID:   character.ID,
-			Name: character.Name,
+		gr := GachaResult{
+			CharacterID: chara.ID,
+			Name: chara.Name,
 		}
 
-		characters = append(characters, c)
+		gachaResults = append(gachaResults, gr)
 	}
 
 	fmt.Println("ガチャを引きました")
 
-	return c.JSON(http.StatusOK, Result{Result: characters})
+	return c.JSON(http.StatusOK, GachaDrawResponse{Results: gachaResults})
 }
 
 // ガチャを引く
-func Gacha() (string, error) {
+func (h Handler) Gacha() (string, error) {
 
-	gachaRates, error := h.db.GetGachaRate()
+	gachaRates, err := h.db.GetGachaRate()
 
-	if error != nil {
-		fmt.Println(error)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	kind := len(gachaRates)
@@ -127,6 +113,6 @@ func Gacha() (string, error) {
 
 	rand.Seed(time.Now().UnixNano())
 
-	return parameter[rand.Intn(maxCnt)], error
+	return parameter[rand.Intn(maxCnt)], err
 
 }
