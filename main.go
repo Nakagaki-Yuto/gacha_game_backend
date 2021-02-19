@@ -1,10 +1,11 @@
 package main
 
 import (
+	"log"
 
 	"go_practice_mvc/database"
+	"go_practice_mvc/handler"
 	"go_practice_mvc/server"
-	"log"
 )
 
 func main() {
@@ -15,6 +16,3 @@ func main() {
 
 	log.Fatal(server.Run())
 }
-
-
-

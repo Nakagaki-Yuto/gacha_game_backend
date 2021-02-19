@@ -7,6 +7,8 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
+
+	"go_practice_mvc/model"
 )
 
 type UserCreateRequest struct {
@@ -18,7 +20,7 @@ type UserCreateResponse struct {
 }
 
 // ユーザアカウント認証情報作成
-func (h Handler) CreateUser(c echo.Context) error {
+func (h *Handler) CreateUser(c echo.Context) error {
 
 	req := new(UserCreateRequest)
 	if err := c.Bind(req); err != nil {
@@ -26,7 +28,7 @@ func (h Handler) CreateUser(c echo.Context) error {
 	}
 	n := req.Name
 	t := CreateToken(n)
-	err := h.db.CreateUser(n, t)
+	err := model.CreateUser(h.db, n, t)
 
 	if err != nil {
 		fmt.Println(err)
@@ -67,10 +69,10 @@ type UserGetResponse struct {
 }
 
 // ユーザ情報取得
-func (h Handler) GetUser(c echo.Context) error {
+func (h *Handler) GetUser(c echo.Context) error {
 
 	t := c.Request().Header.Get("x-token")
-	u, err := h.db.GetUser(t)
+	u, err := model.GetUser(h.db, t)
 
 	if err != nil {
 		fmt.Println(err)
@@ -87,7 +89,7 @@ type UserUpdateRequest struct {
 }
 
 // ユーザ情報更新
-func (h Handler) UpdateUser(c echo.Context) error {
+func (h *Handler) UpdateUser(c echo.Context) error {
 
 	req := new(UserUpdateRequest)
 	if err := c.Bind(req); err != nil {
@@ -95,7 +97,7 @@ func (h Handler) UpdateUser(c echo.Context) error {
 	}
 	n := req.Name
 	t := c.Request().Header.Get("x-token")
-	err := h.db.UpdateUser(n, t)
+	err := model.UpdateUser(h.db, n, t)
 
 	if err != nil {
 		fmt.Println(err)
@@ -104,5 +106,5 @@ func (h Handler) UpdateUser(c echo.Context) error {
 
 	fmt.Println("ユーザ情報を更新しました")
 
-	return c.JSON(http.StatusOK, " ")
+	return c.NoContent(http.StatusOK)
 }

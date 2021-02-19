@@ -8,6 +8,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"go_practice_mvc/model"
 )
 
 
@@ -27,10 +28,10 @@ type GachaResult struct {
 type GachaResults []GachaResult
 
 // ガチャ実行
-func (h Handler) DrawGacha(c echo.Context) error {
+func (h *Handler) DrawGacha(c echo.Context) error {
 	
 	t := c.Request().Header.Get("x-token")
-	u, err := h.db.GetUserID(t)
+	u, err := model.GetUserID(h.db, t)
 	
 	if err != nil {
 		fmt.Println(err)
@@ -56,14 +57,14 @@ func (h Handler) DrawGacha(c echo.Context) error {
 			return err
 		}
 
-		err = h.db.CreateUserCharacter(uI, characterID)
+		err = model.CreateUserCharacter(h.db, uI, characterID)
 
 		if err != nil {
 			fmt.Println(err)
 			return err
 		}
 
-		chara, err := h.db.GetCharacter(characterID)
+		chara, err := model.GetCharacter(h.db, characterID)
 
 		if err != nil {
 			fmt.Println(err)
@@ -86,7 +87,7 @@ func (h Handler) DrawGacha(c echo.Context) error {
 // ガチャを引く
 func (h Handler) Gacha() (string, error) {
 
-	gachaRates, err := h.db.GetGachaRate()
+	gachaRates, err := model.GetGachaRate(h.db, )
 
 	if err != nil {
 		fmt.Println(err)

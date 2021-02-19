@@ -4,18 +4,18 @@ import (
 	"github.com/labstack/echo/v4/middleware" 
 	"github.com/labstack/echo/v4"
 
-	"go_practice_mvc/handler/"
+	"go_practice_mvc/handler"
 )
 
 
 
 type Server struct {
-	handler Handler
+	handler handler.Handler
 }
 
-func New(handler *Handler) *Server {
+func New(handler *handler.Handler) *Server {
 	return &Server{
-		handler: handler,
+		handler: *handler,
 	}
 }
 
