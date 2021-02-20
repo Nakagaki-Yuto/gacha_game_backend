@@ -87,7 +87,7 @@ func (h *Handler) DrawGacha(c echo.Context) error {
 // ガチャを引く
 func (h Handler) Gacha() (string, error) {
 
-	gachaRates, err := model.GetGachaRate(h.db, )
+	gachaRates, err := model.GetGachaRate(h.db)
 
 	if err != nil {
 		fmt.Println(err)

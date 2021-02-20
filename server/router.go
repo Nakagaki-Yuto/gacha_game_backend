@@ -30,6 +30,7 @@ func (s *Server) Run() error {
 	e.PUT("/user/update", s.handler.UpdateUser)
 	e.POST("/gacha/draw", s.handler.DrawGacha)
 	e.GET("/character/list", s.handler.GetCharacterList)
+	e.GET("/ranking", s.handler.GetRanking)
 
 	return e.Start(":8080")
 }

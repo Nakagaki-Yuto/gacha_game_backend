@@ -9,11 +9,12 @@ import (
 // user model
 
 type User struct {
-	ID int `json:"id"`
+	ID    int    `json:"id"`
 	Name  string `json:"name"`
 	Token string `json:"token"`
 }
 
+type Users []User
 
 func CreateUser(db *gorm.DB, name string, token string) error {
 	return db.Create(&User{
@@ -52,12 +53,35 @@ func GetUserID(db *gorm.DB, token string) (User, error) {
 	return u, err
 }
 
+func GetAllUsers(db *gorm.DB) (Users, error) {
+	u := Users{}
+	err := db.Find(&u).Error
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return u, err
+}
+
+func GetUserName(db *gorm.DB, userID int) (User, error) {
+
+	u := User{}
+	err := db.Where("id = ?", userID).Find(&u).Error
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return u, err
+}
 
 // character model
 
 type Character struct {
-	ID   string `json:"characterID"`
-	Name string `json:"name"`
+	ID    string `json:"characterID"`
+	Name  string `json:"name"`
+	Power int    `json:"power"`
 }
 
 func GetCharacter(db *gorm.DB, characterID string) (Character, error) {
@@ -75,7 +99,7 @@ func GetCharacter(db *gorm.DB, characterID string) (Character, error) {
 // user_character model
 
 type UserCharacter struct {
-	UserID int `json:"userID"`
+	UserID      int    `json:"userID"`
 	CharacterID string `json:"characterID"`
 }
 
@@ -93,7 +117,7 @@ func GetUserCharacters(db *gorm.DB, userID int) (UserCharacters, error) {
 
 func CreateUserCharacter(db *gorm.DB, userID int, characterID string) error {
 	return db.Create(&UserCharacter{
-		UserID: userID,
+		UserID:      userID,
 		CharacterID: characterID,
 	}).Error
 }
