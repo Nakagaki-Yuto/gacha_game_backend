@@ -7,8 +7,6 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-var sqlerr error
-
 func New() *gorm.DB {
 	db, sqlerr := sqlConnect()
 	if sqlerr != nil {
@@ -19,6 +17,19 @@ func New() *gorm.DB {
 
 	return db
 }
+
+
+// func New() (*gorm.DB, error) {
+// 	db, err := sqlConnect()
+// 	if err != nil {
+// 		return nil, err
+// 	}
+	
+// 	fmt.Println("DB接続成功")
+
+// 	return db, nil
+// }
+
 
 // SQLConnect DB接続
 func sqlConnect() (database *gorm.DB, err error) {
