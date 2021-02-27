@@ -41,7 +41,7 @@ func (h *Handler) CreateUser(c echo.Context) error {
 
 	n := req.Name
 
-	if n==" " {
+	if n==" " || n=="　" {
 		logger.Error("empty string can't register db")
 		return c.JSON(http.StatusBadRequest, MyError{Msg: "empty string can't register for db"})
 	}
@@ -117,7 +117,7 @@ func (h *Handler) UpdateUser(c echo.Context) error {
 	
 	n := req.Name
 	
-	if n==" " {
+	if n==" " || n=="　" {
 		logger.Error("empty string can't register db")
 		return c.JSON(http.StatusBadRequest, MyError{Msg: "empty string can't register db"})
 	}
