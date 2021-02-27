@@ -1,8 +1,6 @@
 package model
 
 import (
-	"fmt"
-
 	"github.com/jinzhu/gorm"
 )
 
@@ -28,10 +26,11 @@ func GetUser(db *gorm.DB, token string) (User, error) {
 	err := db.Where("token = ?", token).Find(&u).Error
 
 	if err != nil {
-		fmt.Println(err)
+		return User{}, err
 	}
 
-	return u, err
+	return u, nil
+
 }
 
 func UpdateUser(db *gorm.DB, name string, token string) error {
@@ -47,10 +46,10 @@ func GetUserID(db *gorm.DB, token string) (User, error) {
 	err := db.Where("token = ?", token).Find(&u).Error
 
 	if err != nil {
-		fmt.Println(err)
+		return User{}, err
 	}
 
-	return u, err
+	return u, nil
 }
 
 func GetAllUsers(db *gorm.DB) (Users, error) {
@@ -58,10 +57,10 @@ func GetAllUsers(db *gorm.DB) (Users, error) {
 	err := db.Find(&u).Error
 
 	if err != nil {
-		fmt.Println(err)
+		return Users{}, err
 	}
 
-	return u, err
+	return u, nil
 }
 
 func GetUserName(db *gorm.DB, userID int) (User, error) {
@@ -70,10 +69,10 @@ func GetUserName(db *gorm.DB, userID int) (User, error) {
 	err := db.Where("id = ?", userID).Find(&u).Error
 
 	if err != nil {
-		fmt.Println(err)
+		return User{}, err
 	}
 
-	return u, err
+	return u, nil
 }
 
 // character model
@@ -89,10 +88,10 @@ func GetCharacter(db *gorm.DB, characterID string) (Character, error) {
 	err := db.Where("id = ?", characterID).Find(&c).Error
 
 	if err != nil {
-		fmt.Println(err)
+		return Character{}, err
 	}
 
-	return c, err
+	return c, nil
 }
 
 
@@ -110,9 +109,9 @@ func GetUserCharacters(db *gorm.DB, userID int) (UserCharacters, error) {
 	err := db.Where("user_id = ?", userID).Find(&uc).Error
 
 	if err != nil {
-		fmt.Println(err)
+		return UserCharacters{}, err
 	}
-	return uc, err
+	return uc, nil
 }
 
 func CreateUserCharacter(db *gorm.DB, userID int, characterID string) error {
@@ -137,8 +136,8 @@ func GetGachaRate(db *gorm.DB) (GachaRates, error) {
 	err := db.Find(&gr).Error
 
 	if err != nil {
-		fmt.Println(err)
+		return GachaRates{}, err
 	}
 
-	return gr, err
+	return gr, nil
 }

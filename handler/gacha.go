@@ -1,19 +1,19 @@
 package handler
 
 import (
-	"fmt"
 	"math/rand"
 	"net/http"
 	"time"
+	"go.uber.org/zap"
 
 	"github.com/labstack/echo/v4"
+	"github.com/go-playground/validator"
 
 	"go_practice_mvc/model"
 )
 
-
 type GachaDrawRequest struct {
-	Times int `json:"times"`
+	Times int `validate:"required,min=1"`
 }
 
 type GachaDrawResponse struct {
@@ -22,27 +22,34 @@ type GachaDrawResponse struct {
 
 type GachaResult struct {
 	CharacterID string `json:"characterID"`
-	Name string `json:"name"`
+	Name        string `json:"name"`
 }
 
 type GachaResults []GachaResult
 
 // ガチャ実行
 func (h *Handler) DrawGacha(c echo.Context) error {
+
+	logger, _ := zap.NewDevelopment()
+	validate := validator.New()
 	
 	t := c.Request().Header.Get("x-token")
 	u, err := model.GetUserID(h.db, t)
-	
+
 	if err != nil {
-		fmt.Println(err)
-		return err
+		return ErrorHandler(&err, c)
 	}
 
 	uI := u.ID
 	req := new(GachaDrawRequest)
 
 	if err := c.Bind(req); err != nil {
-		return err
+		logger.Error("request is bad")
+		return c.JSON(http.StatusBadRequest, MyError{Msg: err.Error()})
+	}
+	if err := validate.Struct(req); err != nil {
+		logger.Error("request is required")
+		return c.JSON(http.StatusBadRequest, MyError{Msg: err.Error()})
 	}
 
 	times := req.Times
@@ -53,34 +60,30 @@ func (h *Handler) DrawGacha(c echo.Context) error {
 		characterID, err := h.Gacha()
 
 		if err != nil {
-			fmt.Println(err)
-			return err
+			return ErrorHandler(&err, c)
 		}
 
 		err = model.CreateUserCharacter(h.db, uI, characterID)
 
 		if err != nil {
-			fmt.Println(err)
-			return err
+			return ErrorHandler(&err, c)
 		}
 
 		chara, err := model.GetCharacter(h.db, characterID)
 
 		if err != nil {
-			fmt.Println(err)
-			return err
+			return ErrorHandler(&err, c)
 		}
 
 		gr := GachaResult{
 			CharacterID: chara.ID,
-			Name: chara.Name,
+			Name:        chara.Name,
 		}
 
 		gachaResults = append(gachaResults, gr)
 	}
 
-	fmt.Println("ガチャを引きました")
-
+	logger.Info("ガチャを引きました")
 	return c.JSON(http.StatusOK, GachaDrawResponse{Results: gachaResults})
 }
 
@@ -90,7 +93,7 @@ func (h Handler) Gacha() (string, error) {
 	gachaRates, err := model.GetGachaRate(h.db)
 
 	if err != nil {
-		fmt.Println(err)
+		return "", err
 	}
 
 	kind := len(gachaRates)
@@ -114,6 +117,6 @@ func (h Handler) Gacha() (string, error) {
 
 	rand.Seed(time.Now().UnixNano())
 
-	return parameter[rand.Intn(maxCnt)], err
+	return parameter[rand.Intn(maxCnt)], nil
 
 }

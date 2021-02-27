@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"sort"
 
@@ -45,8 +44,7 @@ func (h *Handler) GetRanking(c echo.Context) error {
 	allUsers, err := model.GetAllUsers(h.db)
 
 	if err != nil {
-		fmt.Println(err)
-		return err
+		return ErrorHandler(&err, c)
 	}
 
 	var userMaxPowers UserMaxPowers
@@ -57,17 +55,14 @@ func (h *Handler) GetRanking(c echo.Context) error {
 		u, err := model.GetUserName(h.db, uI)
 
 		if err != nil {
-			fmt.Println(err)
-			return err
+			return ErrorHandler(&err, c)
 		}
 
 		ump.Name = u.Name
-
 		userCharas, err := model. GetUserCharacters(h.db, uI)
 
 		if err != nil {
-			fmt.Println(err)
-			return err
+			return ErrorHandler(&err, c)
 		}
 
 		mp := 0
@@ -75,8 +70,7 @@ func (h *Handler) GetRanking(c echo.Context) error {
 			chara, err := model.GetCharacter(h.db, userCharas[j].CharacterID)
 
 			if err != nil {
-				fmt.Println(err)
-				return err
+				return ErrorHandler(&err, c)
 			}
 
 			if chara.Power > mp {
@@ -85,7 +79,6 @@ func (h *Handler) GetRanking(c echo.Context) error {
 		}
 
 		ump.MaxPower = mp
-
 		userMaxPowers = append(userMaxPowers, ump)
 
 	}

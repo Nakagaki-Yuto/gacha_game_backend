@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"go.uber.org/zap"
 
 	"github.com/labstack/echo/v4"
 
@@ -23,20 +24,19 @@ type UserCharacters []UserCharacter
 
 // ユーザ所持キャラクター一覧取得
 func (h *Handler) GetCharacterList(c echo.Context) error {
-
+	
+	logger, _ := zap.NewDevelopment()
 	t := c.Request().Header.Get("x-token")
 	u, err := model.GetUserID(h.db, t)
 
 	if err != nil {
-		fmt.Println(err)
-		return err
+		return ErrorHandler(&err, c)
 	}
 
 	uI := u.ID
 	userCharas, err := model.GetUserCharacters(h.db, uI)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		return ErrorHandler(&err, c)
 	}
 
 	var userCharacters UserCharacters
@@ -48,8 +48,7 @@ func (h *Handler) GetCharacterList(c echo.Context) error {
 		chara, err := model.GetCharacter(h.db, cI)
 
 		if err != nil {
-			fmt.Println(err)
-			return err
+			return ErrorHandler(&err, c)
 		}
 
 		uc.Name = chara.Name
@@ -58,7 +57,6 @@ func (h *Handler) GetCharacterList(c echo.Context) error {
 		userCharacters = append(userCharacters, uc)
 	}
 
-	fmt.Println("ユーザ-キャラクター一覧を取得しました")
-
+	logger.Info("ユーザ-キャラクター一覧を取得しました")
 	return c.JSON(http.StatusOK, CharacterListResponse{Characters: userCharacters})
 }

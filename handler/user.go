@@ -2,18 +2,20 @@ package handler
 
 import (
 	"fmt"
-	"log"
 	"net/http"
-	// "go.uber.org/zap"
+	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
+	"github.com/go-playground/validator"
 
 	"go_practice_mvc/model"
 )
 
 type UserCreateRequest struct {
-	Name string `json:"name"`
+	Name string `validate:"required"`
 }
 
 type UserCreateResponse struct {
@@ -23,21 +25,36 @@ type UserCreateResponse struct {
 // ユーザアカウント認証情報作成
 func (h *Handler) CreateUser(c echo.Context) error {
 
+	logger, _ := zap.NewDevelopment()
+	validate := validator.New()
+
 	req := new(UserCreateRequest)
+
 	if err := c.Bind(req); err != nil {
-		return err
+		logger.Error("request is bad")
+		return c.JSON(http.StatusBadRequest, MyError{Msg: err.Error()})
 	}
+	if err := validate.Struct(req); err != nil {
+		logger.Error("request is required")
+		return c.JSON(http.StatusBadRequest, MyError{Msg: err.Error()})
+	}
+
 	n := req.Name
+
+	if n==" " {
+		logger.Error("empty string can't register db")
+		return c.JSON(http.StatusBadRequest, MyError{Msg: "empty string can't register for db"})
+	}
+	
 	t := CreateToken(n)
 	err := model.CreateUser(h.db, n, t)
 
 	if err != nil {
-		fmt.Println(err)
-		return err
+		fmt.Println("エラー3")
+		return ErrorHandler(&err, c)
 	}
 
-	fmt.Println("ユーザアカウント認証情報を作成しました")
-
+	logger.Info("ユーザアカウント認証情報を作成しました")
 	return c.JSON(http.StatusOK, UserCreateResponse{Token: t})
 }
 
@@ -48,19 +65,12 @@ func CreateToken(name string) string {
 	secret := "secret"
 
 	// Token を作成
-	// jwt -> JSON Web Token - JSON をセキュアにやり取りするための仕様
-	// jwtの構造 -> {Base64 encoded Header}.{Base64 encoded Payload}.{Signature}
-	// HS254 -> 証明生成用(https://ja.wikipedia.org/wiki/JSON_Web_Token)
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"name": name,
-		"iss":  "init",
+		"exp":  time.Now().Add(time.Hour * 1).Unix(),
 	})
 
-	tokenString, err := t.SignedString([]byte(secret))
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	tokenString, _ := t.SignedString([]byte(secret))
 
 	return tokenString
 }
@@ -72,40 +82,54 @@ type UserGetResponse struct {
 // ユーザ情報取得
 func (h *Handler) GetUser(c echo.Context) error {
 
+	logger, _ := zap.NewDevelopment()
 	t := c.Request().Header.Get("x-token")
 	u, err := model.GetUser(h.db, t)
 
 	if err != nil {
-		fmt.Println(err)
-		return err
+		return ErrorHandler(&err, c)
 	}
 
-	fmt.Println("ユーザ情報を取得しました")
-
+	logger.Info("ユーザ情報を取得しました")
 	return c.JSON(http.StatusOK, UserGetResponse{Name: u.Name})
 }
 
 type UserUpdateRequest struct {
-	Name string `json:"name"`
+	Name string `validate:"required"`
 }
 
 // ユーザ情報更新
 func (h *Handler) UpdateUser(c echo.Context) error {
 
+	logger, _ := zap.NewDevelopment()
+	validate := validator.New()
+
 	req := new(UserUpdateRequest)
+
 	if err := c.Bind(req); err != nil {
-		return err
+		logger.Error("request is bad")
+		return c.JSON(http.StatusBadRequest, MyError{Msg: err.Error()})
 	}
+	if err := validate.Struct(req); err != nil {
+		logger.Error("request is required")
+		return c.JSON(http.StatusBadRequest, MyError{Msg: err.Error()})
+	}
+	
 	n := req.Name
+	
+	if n==" " {
+		logger.Error("empty string can't register db")
+		return c.JSON(http.StatusBadRequest, MyError{Msg: "empty string can't register db"})
+	}
+
+
 	t := c.Request().Header.Get("x-token")
 	err := model.UpdateUser(h.db, n, t)
-
+	
 	if err != nil {
-		fmt.Println(err)
-		return err
+		return ErrorHandler(&err, c)
 	}
-
-	fmt.Println("ユーザ情報を更新しました")
-
+	
+	logger.Info("ユーザ情報を更新しました")
 	return c.NoContent(http.StatusOK)
 }
