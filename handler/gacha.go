@@ -97,26 +97,22 @@ func (h Handler) Gacha() (string, error) {
 	}
 
 	kind := len(gachaRates)
-	rates := make([]int, kind)
 	maxCnt := 0
 
 	for i := 0; i < kind; i++ {
 		targetRate := gachaRates[i].Rate
 		maxCnt += targetRate
-		rates[i] = targetRate
-	}
-
-	parameter := make([]string, maxCnt)
-	targetCnt := 0
-	for i := 0; i < kind; i++ {
-		for j := targetCnt; j < targetCnt+rates[i]; j++ {
-			parameter[j] = gachaRates[i].CharacterID
-		}
-		targetCnt += rates[i]
 	}
 
 	rand.Seed(time.Now().UnixNano())
+	targetRand := rand.Intn(maxCnt)
+	targetCnt := 0
 
-	return parameter[rand.Intn(maxCnt)], nil
-
+	for i := 0; i < kind; i++ {
+		targetCnt += gachaRates[i].Rate
+		if targetRand < targetCnt{
+			return gachaRates[i].CharacterID, nil
+		}
+	}
+	return gachaRates[kind-1].CharacterID, nil
 }

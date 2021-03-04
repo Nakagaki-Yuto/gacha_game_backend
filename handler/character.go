@@ -39,7 +39,7 @@ func (h *Handler) GetCharacterList(c echo.Context) error {
 		return ErrorHandler(&err, c)
 	}
 
-	var userCharacters UserCharacters
+	var userCharacters = make([]UserCharacter, 0)
 
 	for i := 0; i < len(userCharas); i++ {
 		cI := userCharas[i].CharacterID
